@@ -21,3 +21,18 @@ export async function getCompanyById(id) {
 
     return JSON.parse(JSON.stringify(company))
 }
+
+export async function createCompany(data) {
+    await delay()
+
+    const newCompany = {
+        id: Date.now(),
+        name: data.name,
+        cnpj: data.cnpj,
+        status: data.status,
+        users: [],
+    }
+
+    companies.push(newCompany)
+    return JSON.parse(JSON.stringify(newCompany))
+}

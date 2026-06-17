@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getCompanyById } from '@/services/companyService'
+import { getCompanyById, updateCompany } from '@/services/companyService'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -32,6 +32,10 @@ onMounted(() => {
     <main>
         <h1>Detalhes da Empresa</h1>
 
+        <p>
+            <RouterLink to="/empresas">Voltar para a lista</RouterLink>
+        </p>
+
         <p v-if="loading">Carregando detalhes da empresa...</p>
 
         <p v-else-if="error">{{ error }}</p>
@@ -40,7 +44,7 @@ onMounted(() => {
             <article>
                 <h2>{{ company.name }}</h2>
                 <p>CNPJ: {{ company.cnpj }}</p>
-                <p>Status: {{ company.status }}</p>
+                <p>Status: {{ company.status === 1 ? 'Ativa' : 'Inativa' }}</p>
             </article>
         </section>
     </main>

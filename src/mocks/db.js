@@ -3,7 +3,7 @@ export const companies = [
     id: 1,
     name: 'Empresa Alpha',
     cnpj: '00.000.000/0001-00',
-    status: 'ativa',
+    status: 1,
     users: [
       {
         id: 1,
@@ -23,7 +23,7 @@ export const companies = [
     id: 2,
     name: 'Empresa Beta',
     cnpj: '11.111.111/0001-11',
-    status: 'inativa',
+    status: 0,
     users: [
       {
         id: 3,
@@ -37,7 +37,7 @@ export const companies = [
     id: 3,
     name: 'Empresa Gama',
     cnpj: '22.222.222/0001-22',
-    status: 'ativa',
+    status: 1,
     users: [
       {
         id: 4,

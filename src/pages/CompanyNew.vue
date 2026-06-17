@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { createCompany } from '@/services/companyService'
+import { isValidCnpj } from '@/utils/cnpj'
 
 const form = reactive({
   name: '',
@@ -30,6 +31,9 @@ function validateForm() {
   if (!form.cnpj.trim()) {
     fieldErrors.cnpj = 'CNPJ é obrigatório'
     valid = false
+  } else if (!isValidCnpj(form.cnpj)) {
+    fieldErrors.cnpj = 'CNPJ inválido'
+    valid = false
   }
 
   return valid
@@ -49,7 +53,13 @@ async function handleSubmit() {
     await createCompany(form)
     success.value = 'Empresa cadastrada com sucesso'
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Erro ao salvar empresa'
+    const message = err instanceof Error ? err.message : 'Erro ao salvar empresa'
+
+    if (message === 'CNPJ já cadastrado') {
+      fieldErrors.cnpj = message
+    } else {
+      error.value = message
+    }
   } finally {
     saving.value = false
   }

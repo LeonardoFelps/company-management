@@ -40,6 +40,12 @@ function prevPage() {
 }
 
 async function handleDelete(id) {
+  const confirmed = window.confirm('Tem certeza que deseja excluir esta empresa?')
+
+  if (!confirmed) {
+    return
+  }
+
   await deleteCompany(id)
   await loadCompanies(currentPage.value)
 }

@@ -2,6 +2,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getCompanyById, updateCompany } from '@/services/companyService'
+import { isValidCnpj } from '@/utils/cnpj'
 
 const route = useRoute()
 const id = route.params.id
@@ -51,6 +52,9 @@ function validateForm() {
   if (!form.cnpj.trim()) {
     fieldErrors.cnpj = 'CNPJ é obrigatório'
     valid = false
+  } else if (!isValidCnpj(form.cnpj)) {
+    fieldErrors.cnpj = 'CNPJ inválido'
+    valid = false
   }
 
   return valid
@@ -70,7 +74,13 @@ async function handleSubmit() {
     await updateCompany(id, form)
     success.value = 'Empresa atualizada com sucesso'
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Erro ao salvar empresa'
+    const message = err instanceof Error ? err.message : 'Erro ao salvar empresa'
+
+    if (message === 'CNPJ já cadastrado') {
+      fieldErrors.cnpj = message
+    } else {
+      error.value = message
+    }
   } finally {
     saving.value = false
   }

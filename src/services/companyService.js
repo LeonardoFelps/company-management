@@ -36,3 +36,19 @@ export async function createCompany(data) {
     companies.push(newCompany)
     return JSON.parse(JSON.stringify(newCompany))
 }
+
+export async function updateCompany(id, data){
+    await delay()
+
+    const company = companies.find((item) => item.id === Number(id))
+
+    if (!company) {
+        throw new Error('Empresa não encontrada')
+    }
+
+    company.name = data.name
+    company.cnpj = data.cnpj
+    company.status = data.status
+
+    return JSON.parse(JSON.stringify(company))
+}

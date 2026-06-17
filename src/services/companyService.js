@@ -52,3 +52,17 @@ export async function updateCompany(id, data){
 
     return JSON.parse(JSON.stringify(company))
 }
+
+export async function deleteCompany(id) {
+  await delay()
+
+  const index = companies.findIndex((item) => item.id === Number(id))
+
+  if (index === -1) {
+    throw new Error('Empresa não encontrada')
+  }
+
+  companies.splice(index, 1)
+
+  return true
+}

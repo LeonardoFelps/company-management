@@ -1,49 +1,281 @@
 export const companies = [
   {
     id: 1,
-    name: 'Empresa Alpha',
-    cnpj: '00.000.000/0001-00',
+    name: 'Empresa 1',
+    cnpj: '00.000.000/0001-91',
     status: 1,
     users: [
       {
         id: 1,
-        name: 'Joao Silva',
-        email: 'joao@alpha.com',
+        name: 'Usuario 1',
+        email: 'usuario1@empresa1.com',
         role: 'Administrador',
-      },
-      {
-        id: 2,
-        name: 'Maria Souza',
-        email: 'maria@alpha.com',
-        role: 'Analista',
       },
     ],
   },
   {
     id: 2,
-    name: 'Empresa Beta',
-    cnpj: '11.111.111/0001-11',
+    name: 'Empresa 2',
+    cnpj: '00.000.000/0002-72',
     status: 0,
     users: [
       {
-        id: 3,
-        name: 'Mauro Santos',
-        email: 'mauro@beta.com',
-        role: 'Administrador',
+        id: 2,
+        name: 'Usuario 2',
+        email: 'usuario2@empresa2.com',
+        role: 'Analista',
       },
     ],
   },
   {
     id: 3,
-    name: 'Empresa Gama',
-    cnpj: '22.222.222/0001-22',
+    name: 'Empresa 3',
+    cnpj: '00.000.000/0003-53',
     status: 1,
     users: [
       {
-        id: 4,
-        name: 'Tiago Mendes',
-        email: 'tiago@gama.com',
+        id: 3,
+        name: 'Usuario 3',
+        email: 'usuario3@empresa3.com',
         role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Empresa 4',
+    cnpj: '00.000.000/0004-34',
+    status: 0,
+    users: [
+      {
+        id: 4,
+        name: 'Usuario 4',
+        email: 'usuario4@empresa4.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Empresa 5',
+    cnpj: '00.000.000/0005-15',
+    status: 1,
+    users: [
+      {
+        id: 5,
+        name: 'Usuario 5',
+        email: 'usuario5@empresa5.com',
+        role: 'Analista',
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Empresa 6',
+    cnpj: '00.000.000/0006-04',
+    status: 0,
+    users: [
+      {
+        id: 6,
+        name: 'Usuario 6',
+        email: 'usuario6@empresa6.com',
+        role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Empresa 7',
+    cnpj: '00.000.000/0007-87',
+    status: 1,
+    users: [
+      {
+        id: 7,
+        name: 'Usuario 7',
+        email: 'usuario7@empresa7.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: 'Empresa 8',
+    cnpj: '00.000.000/0008-68',
+    status: 0,
+    users: [
+      {
+        id: 8,
+        name: 'Usuario 8',
+        email: 'usuario8@empresa8.com',
+        role: 'Analista',
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: 'Empresa 9',
+    cnpj: '00.000.000/0009-49',
+    status: 1,
+    users: [
+      {
+        id: 9,
+        name: 'Usuario 9',
+        email: 'usuario9@empresa9.com',
+        role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: 'Empresa 10',
+    cnpj: '00.000.000/0010-82',
+    status: 0,
+    users: [
+      {
+        id: 10,
+        name: 'Usuario 10',
+        email: 'usuario10@empresa10.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 11,
+    name: 'Empresa 11',
+    cnpj: '00.000.000/0011-63',
+    status: 1,
+    users: [
+      {
+        id: 11,
+        name: 'Usuario 11',
+        email: 'usuario11@empresa11.com',
+        role: 'Analista',
+      },
+    ],
+  },
+  {
+    id: 12,
+    name: 'Empresa 12',
+    cnpj: '00.000.000/0012-44',
+    status: 0,
+    users: [
+      {
+        id: 12,
+        name: 'Usuario 12',
+        email: 'usuario12@empresa12.com',
+        role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 13,
+    name: 'Empresa 13',
+    cnpj: '00.000.000/0013-25',
+    status: 1,
+    users: [
+      {
+        id: 13,
+        name: 'Usuario 13',
+        email: 'usuario13@empresa13.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 14,
+    name: 'Empresa 14',
+    cnpj: '00.000.000/0014-06',
+    status: 0,
+    users: [
+      {
+        id: 14,
+        name: 'Usuario 14',
+        email: 'usuario14@empresa14.com',
+        role: 'Analista',
+      },
+    ],
+  },
+  {
+    id: 15,
+    name: 'Empresa 15',
+    cnpj: '00.000.000/0015-97',
+    status: 1,
+    users: [
+      {
+        id: 15,
+        name: 'Usuario 15',
+        email: 'usuario15@empresa15.com',
+        role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 16,
+    name: 'Empresa 16',
+    cnpj: '00.000.000/0016-78',
+    status: 0,
+    users: [
+      {
+        id: 16,
+        name: 'Usuario 16',
+        email: 'usuario16@empresa16.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 17,
+    name: 'Empresa 17',
+    cnpj: '00.000.000/0017-59',
+    status: 1,
+    users: [
+      {
+        id: 17,
+        name: 'Usuario 17',
+        email: 'usuario17@empresa17.com',
+        role: 'Analista',
+      },
+    ],
+  },
+  {
+    id: 18,
+    name: 'Empresa 18',
+    cnpj: '00.000.000/0018-30',
+    status: 0,
+    users: [
+      {
+        id: 18,
+        name: 'Usuario 18',
+        email: 'usuario18@empresa18.com',
+        role: 'Gerente',
+      },
+    ],
+  },
+  {
+    id: 19,
+    name: 'Empresa 19',
+    cnpj: '00.000.000/0019-10',
+    status: 1,
+    users: [
+      {
+        id: 19,
+        name: 'Usuario 19',
+        email: 'usuario19@empresa19.com',
+        role: 'Administrador',
+      },
+    ],
+  },
+  {
+    id: 20,
+    name: 'Empresa 20',
+    cnpj: '00.000.000/0020-54',
+    status: 0,
+    users: [
+      {
+        id: 20,
+        name: 'Usuario 20',
+        email: 'usuario20@empresa20.com',
+        role: 'Analista',
       },
     ],
   },

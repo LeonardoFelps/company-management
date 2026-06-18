@@ -90,6 +90,16 @@ select:focus {
   border-color: var(--primary);
 }
 
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type='search'] {
+  appearance: textfield;
+}
+
 main {
   width: min(1080px, calc(100% - 32px));
   margin: 24px auto;

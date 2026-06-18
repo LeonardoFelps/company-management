@@ -1,7 +1,22 @@
 <script setup>
 import { computed, reactive, ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import {
+  ArrowLeft,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Save,
+  Search,
+  Trash2,
+  UserPlus,
+  Users,
+  X,
+} from '@lucide/vue'
 import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
+import { formatCnpj, maskCnpj } from '@/utils/cnpj'
 
 const route = useRoute()
 const id = route.params.id
@@ -20,6 +35,7 @@ const error = ref('')
 const currentUserPage = ref(1)
 const usersPerPage = 5
 const userSearchTerm = ref('')
+const showCnpj = ref(false)
 
 const hasUsers = computed(() => {
   return Array.isArray(company.value?.users) && company.value.users.length > 0
@@ -56,6 +72,18 @@ const paginatedUsers = computed(() => {
 
 function syncUserPage() {
   currentUserPage.value = Math.min(Math.max(currentUserPage.value, 1), totalUserPages.value)
+}
+
+function toggleCnpjVisibility() {
+  showCnpj.value = !showCnpj.value
+}
+
+function getDisplayedCnpj(value) {
+  return showCnpj.value ? formatCnpj(value) : maskCnpj(value)
+}
+
+function clearUserSearch() {
+  userSearchTerm.value = ''
 }
 
 const showUserModal = ref(false)
@@ -185,12 +213,18 @@ onMounted(() => {
 <template>
   <main>
     <div class="toolbar">
-      <div>
-        <h1>Detalhes da Empresa</h1>
-        <p class="subtle">Visão geral do cadastro selecionado.</p>
+      <div class="page-title">
+        <Users class="title-icon" :size="24" />
+        <div>
+          <h1>Detalhes da Empresa</h1>
+          <p class="subtle">Visão geral do cadastro selecionado.</p>
+        </div>
       </div>
 
-      <RouterLink class="secondary-link" to="/empresas">Voltar para a lista</RouterLink>
+      <RouterLink class="secondary-link" to="/empresas">
+        <ArrowLeft :size="16" />
+        Voltar para a lista
+      </RouterLink>
     </div>
 
     <p v-if="loading" class="subtle">Carregando detalhes da empresa...</p>
@@ -199,12 +233,28 @@ onMounted(() => {
     <section v-else-if="company" class="company-layout">
       <article class="details-card company-summary">
         <p class="section-label">Empresa</p>
+        <div class="summary-badge">
+          <Building2 :size="16" />
+          Cadastro principal
+        </div>
         <h2>{{ company.name }}</h2>
 
         <div class="meta-list">
           <div>
             <span class="meta-label">CNPJ</span>
-            <p>{{ company.cnpj }}</p>
+            <div class="inline-meta">
+              <p>{{ getDisplayedCnpj(company.cnpj) }}</p>
+              <button
+                type="button"
+                class="icon-button"
+                :aria-label="showCnpj ? 'Ocultar CNPJ' : 'Exibir CNPJ'"
+                :title="showCnpj ? 'Ocultar CNPJ' : 'Exibir CNPJ'"
+                @click="toggleCnpjVisibility"
+              >
+                <EyeOff v-if="showCnpj" :size="16" />
+                <Eye v-else :size="16" />
+              </button>
+            </div>
           </div>
 
           <div>
@@ -226,18 +276,33 @@ onMounted(() => {
             <h3>Usuários vinculados</h3>
           </div>
 
-          <button type="button" @click="openUserModal">Adicionar usuário</button>
+          <button type="button" class="primary-button" @click="openUserModal">
+            <UserPlus :size="16" />
+            Adicionar usuário
+          </button>
         </div>
 
         <div class="filter-bar filter-bar--compact">
           <div class="field filter-field">
             <label for="user-search">Buscar usuário</label>
-            <input
-              id="user-search"
-              v-model="userSearchTerm"
-              type="search"
-              placeholder="Nome, e-mail ou cargo"
-            />
+            <div class="search-input-wrap">
+              <Search class="search-icon" :size="16" />
+              <input
+                id="user-search"
+                v-model="userSearchTerm"
+                type="search"
+                placeholder="Nome, e-mail ou cargo"
+              />
+              <button
+                v-if="userSearchTerm"
+                type="button"
+                class="icon-button"
+                aria-label="Limpar filtro"
+                @click="clearUserSearch"
+              >
+                <X :size="16" />
+              </button>
+            </div>
           </div>
 
           <p class="subtle filter-meta">
@@ -267,6 +332,7 @@ onMounted(() => {
                     class="danger-button small-button"
                     @click="handleRemoveUser(user.id)"
                   >
+                    <Trash2 :size="16" />
                     Remover
                   </button>
                 </td>
@@ -281,6 +347,7 @@ onMounted(() => {
               :disabled="currentUserPage === 1"
               @click="currentUserPage--"
             >
+              <ChevronLeft :size="16" />
               Anterior
             </button>
 
@@ -293,6 +360,7 @@ onMounted(() => {
               @click="currentUserPage++"
             >
               Próxima
+              <ChevronRight :size="16" />
             </button>
           </div>
         </div>
@@ -335,10 +403,11 @@ onMounted(() => {
           </div>
 
           <div class="actions">
-            <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
-            <button type="submit" :disabled="userSaving">
-              {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
-            </button>
+          <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
+          <button type="submit" class="primary-button" :disabled="userSaving">
+            <Save v-if="!userSaving" :size="16" />
+            {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
+          </button>
           </div>
         </form>
       </div>

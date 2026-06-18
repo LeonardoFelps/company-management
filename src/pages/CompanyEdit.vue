@@ -1,8 +1,9 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { ArrowLeft, Pencil, Save } from '@lucide/vue'
 import { getCompanyById, updateCompany } from '@/services/companyService'
-import { isValidCnpj } from '@/utils/cnpj'
+import { formatCnpj, isValidCnpj } from '@/utils/cnpj'
 
 const route = useRoute()
 const id = route.params.id
@@ -86,6 +87,10 @@ async function handleSubmit() {
   }
 }
 
+function handleCnpjInput() {
+  form.cnpj = formatCnpj(form.cnpj)
+}
+
 onMounted(() => {
   loadCompany()
 })
@@ -94,12 +99,18 @@ onMounted(() => {
 <template>
   <main>
     <div class="toolbar">
-      <div>
+      <div class="page-title">
+        <Pencil class="title-icon" :size="24" />
+        <div>
         <h1>Editar empresa</h1>
         <p class="subtle">Atualize os dados cadastrais da empresa selecionada.</p>
+        </div>
       </div>
 
-      <RouterLink class="secondary-link" to="/empresas">Voltar para a lista</RouterLink>
+      <RouterLink class="secondary-link ghost-button" to="/empresas">
+        <ArrowLeft :size="16" />
+        Voltar para a lista
+      </RouterLink>
     </div>
 
     <p v-if="loading" class="subtle">Carregando empresa...</p>
@@ -114,7 +125,7 @@ onMounted(() => {
 
       <div class="field">
         <label for="cnpj">CNPJ</label>
-        <input id="cnpj" v-model="form.cnpj" type="text" />
+        <input id="cnpj" v-model="form.cnpj" type="text" @input="handleCnpjInput" />
         <p v-if="fieldErrors.cnpj" class="field-error">{{ fieldErrors.cnpj }}</p>
       </div>
 
@@ -126,7 +137,8 @@ onMounted(() => {
         </select>
       </div>
 
-      <button type="submit" :disabled="saving">
+      <button type="submit" class="primary-button" :disabled="saving">
+        <Save v-if="!saving" :size="16" />
         {{ saving ? 'Salvando...' : 'Salvar' }}
       </button>
 

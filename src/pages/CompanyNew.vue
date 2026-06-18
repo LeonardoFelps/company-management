@@ -1,7 +1,8 @@
 <script setup>
 import { reactive, ref } from 'vue'
+import { ArrowLeft, Building2, Save } from '@lucide/vue'
 import { createCompany } from '@/services/companyService'
-import { isValidCnpj } from '@/utils/cnpj'
+import { formatCnpj, isValidCnpj } from '@/utils/cnpj'
 
 const form = reactive({
   name: '',
@@ -65,17 +66,27 @@ async function handleSubmit() {
   }
 }
 
+function handleCnpjInput() {
+  form.cnpj = formatCnpj(form.cnpj)
+}
+
 </script>
 
 <template>
   <main>
     <div class="toolbar">
-      <div>
+      <div class="page-title">
+        <Building2 class="title-icon" :size="24" />
+        <div>
         <h1>Cadastrar empresa</h1>
         <p class="subtle">Crie um novo cadastro para entrar na listagem.</p>
+        </div>
       </div>
 
-      <RouterLink class="secondary-link" to="/empresas">Voltar para a lista</RouterLink>
+      <RouterLink class="secondary-link ghost-button" to="/empresas">
+        <ArrowLeft :size="16" />
+        Voltar para a lista
+      </RouterLink>
     </div>
 
     <p v-if="error" class="notice-error">{{ error }}</p>
@@ -90,7 +101,7 @@ async function handleSubmit() {
 
       <div class="field">
         <label for="cnpj">CNPJ</label>
-        <input id="cnpj" v-model="form.cnpj" type="text" />
+        <input id="cnpj" v-model="form.cnpj" type="text" @input="handleCnpjInput" />
         <p v-if="fieldErrors.cnpj" class="field-error">{{ fieldErrors.cnpj }}</p>
       </div>
 
@@ -102,7 +113,8 @@ async function handleSubmit() {
         </select>
       </div>
 
-      <button type="submit" :disabled="saving">
+      <button type="submit" class="primary-button" :disabled="saving">
+        <Save v-if="!saving" :size="16" />
         {{ saving ? 'Salvando...' : 'Salvar' }}
       </button>
     </form>

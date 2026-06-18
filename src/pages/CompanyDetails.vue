@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  Pencil,
   Save,
   Search,
   Trash2,
@@ -15,7 +16,12 @@ import {
   Users,
   X,
 } from '@lucide/vue'
-import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
+import {
+  getCompanyById,
+  addUserToCompany,
+  removeUserFromCompany,
+  updateUserInCompany,
+} from '@/services/companyService'
 import { formatCnpj, maskCnpj } from '@/utils/cnpj'
 
 const route = useRoute()
@@ -66,7 +72,6 @@ const totalUserPages = computed(() => {
 
 const paginatedUsers = computed(() => {
   const start = (currentUserPage.value - 1) * usersPerPage
-
   return filteredUsers.value.slice(start, start + usersPerPage)
 })
 
@@ -87,6 +92,7 @@ function clearUserSearch() {
 }
 
 const showUserModal = ref(false)
+const editingUserId = ref(null)
 
 const userForm = reactive({
   name: '',
@@ -106,6 +112,7 @@ function resetUserForm() {
   userForm.name = ''
   userForm.email = ''
   userForm.role = ''
+  editingUserId.value = null
 
   userError.value = ''
   userFieldErrors.name = ''
@@ -118,8 +125,21 @@ function openUserModal() {
   showUserModal.value = true
 }
 
+function openEditUserModal(user) {
+  userForm.name = user.name
+  userForm.email = user.email
+  userForm.role = user.role
+  editingUserId.value = user.id
+  userError.value = ''
+  userFieldErrors.name = ''
+  userFieldErrors.email = ''
+  userFieldErrors.role = ''
+  showUserModal.value = true
+}
+
 function closeUserModal() {
   showUserModal.value = false
+  editingUserId.value = null
 }
 
 function validateUserForm() {
@@ -160,9 +180,14 @@ async function handleAddUser() {
   userSaving.value = true
 
   try {
-    await addUserToCompany(id, userForm)
+    if (editingUserId.value) {
+      await updateUserInCompany(id, editingUserId.value, userForm)
+    } else {
+      await addUserToCompany(id, userForm)
+      currentUserPage.value = totalUserPages.value
+    }
+
     await loadCompany()
-    currentUserPage.value = totalUserPages.value
     closeUserModal()
   } catch (err) {
     userError.value = err instanceof Error ? err.message : 'Erro ao salvar usuário'
@@ -327,14 +352,25 @@ onMounted(() => {
                 <td>{{ user.email }}</td>
                 <td>{{ user.role }}</td>
                 <td>
-                  <button
-                    type="button"
-                    class="danger-button small-button"
-                    @click="handleRemoveUser(user.id)"
-                  >
-                    <Trash2 :size="16" />
-                    Remover
-                  </button>
+                  <div class="actions user-actions">
+                    <button
+                      type="button"
+                      class="edit-button small-button"
+                      @click="openEditUserModal(user)"
+                    >
+                      <Pencil :size="16" />
+                      Editar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="danger-button small-button"
+                      @click="handleRemoveUser(user.id)"
+                    >
+                      <Trash2 :size="16" />
+                      Remover
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -372,13 +408,21 @@ onMounted(() => {
 
     <div v-if="showUserModal" class="modal-backdrop">
       <div class="modal-card">
+        <button
+          type="button"
+          class="modal-close-button"
+          aria-label="Fechar modal"
+          title="Fechar"
+          @click="closeUserModal"
+        >
+          <X :size="18" />
+        </button>
+
         <div class="section-header">
           <div>
-            <p class="section-label">Novo usuário</p>
-            <h3>Adicionar usuário</h3>
+            <p class="section-label">Usuário</p>
+            <h3>{{ editingUserId ? 'Editar usuário' : 'Adicionar usuário' }}</h3>
           </div>
-
-          <button type="button" class="ghost-button" @click="closeUserModal">Fechar</button>
         </div>
 
         <p v-if="userError" class="notice-error">{{ userError }}</p>
@@ -403,11 +447,11 @@ onMounted(() => {
           </div>
 
           <div class="actions">
-          <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
-          <button type="submit" class="primary-button" :disabled="userSaving">
-            <Save v-if="!userSaving" :size="16" />
-            {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
-          </button>
+            <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
+            <button type="submit" class="primary-button" :disabled="userSaving">
+              <Save v-if="!userSaving" :size="16" />
+              {{ userSaving ? 'Salvando...' : editingUserId ? 'Atualizar usuário' : 'Salvar usuário' }}
+            </button>
           </div>
         </form>
       </div>

@@ -73,6 +73,15 @@ function hasDuplicateCnpj(cnpj, currentId) {
   })
 }
 
+function hasDuplicateUserEmail(company, email, currentUserId) {
+  const normalizedEmail = normalizeSearch(email)
+
+  return company.users.some((user) => {
+    const isSameUser = currentUserId != null && user.id === Number(currentUserId)
+    return !isSameUser && normalizeSearch(user.email) === normalizedEmail
+  })
+}
+
 export async function listCompanies(page = 1, perPage = 5, search = '') {
   await delay()
   await ensureStoreLoaded()
@@ -172,6 +181,10 @@ export async function addUserToCompany(companyId, userData) {
     throw new Error('Empresa não encontrada')
   }
 
+  if (hasDuplicateUserEmail(company, userData.email)) {
+    throw new Error('E-mail já cadastrado')
+  }
+
   const newUser = {
     id: Date.now(),
     name: userData.name,
@@ -182,6 +195,33 @@ export async function addUserToCompany(companyId, userData) {
   company.users.push(newUser)
 
   return clone(newUser)
+}
+
+export async function updateUserInCompany(companyId, userId, userData) {
+  await delay()
+  await ensureStoreLoaded()
+
+  const company = companiesStore.find((item) => item.id === Number(companyId))
+
+  if (!company) {
+    throw new Error('Empresa não encontrada')
+  }
+
+  const user = company.users.find((item) => item.id === Number(userId))
+
+  if (!user) {
+    throw new Error('Usuário não encontrado')
+  }
+
+  if (hasDuplicateUserEmail(company, userData.email, userId)) {
+    throw new Error('E-mail já cadastrado')
+  }
+
+  user.name = userData.name
+  user.email = userData.email
+  user.role = userData.role
+
+  return clone(user)
 }
 
 export async function removeUserFromCompany(companyId, userId) {

@@ -618,6 +618,11 @@ article {
   vertical-align: middle;
 }
 
+.users-table th:last-child,
+.users-table td:last-child {
+  width: 190px;
+}
+
 .users-table th {
   font-size: 0.86rem;
   color: var(--muted);
@@ -630,6 +635,27 @@ article {
 
 .users-table button {
   min-width: 108px;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.user-actions button {
+  min-width: 0;
+  width: 82px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.user-actions button svg {
+  width: 14px;
+  height: 14px;
 }
 
 .small-button {
@@ -647,12 +673,36 @@ article {
 }
 
 .modal-card {
+  position: relative;
   width: min(100%, 520px);
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 24px 20px 20px;
   box-shadow: var(--shadow);
+}
+
+.modal-card .section-header {
+  align-items: flex-start;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  flex: 0 0 auto;
+}
+
+.modal-close-button:hover {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .empty-state {

@@ -1,32 +1,57 @@
 <script setup>
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, reactive, ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
 
 const route = useRoute()
 const id = route.params.id
 
+function normalizeSearch(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+}
+
 const company = ref(null)
 const loading = ref(false)
 const error = ref('')
 const currentUserPage = ref(1)
 const usersPerPage = 5
+const userSearchTerm = ref('')
 
 const hasUsers = computed(() => {
   return Array.isArray(company.value?.users) && company.value.users.length > 0
 })
 
-const totalUserPages = computed(() => {
-  const totalUsers = company.value?.users?.length ?? 0
+const filteredUsers = computed(() => {
+  const users = company.value?.users ?? []
+  const term = normalizeSearch(userSearchTerm.value)
 
-  return Math.max(1, Math.ceil(totalUsers / usersPerPage))
+  if (!term) {
+    return users
+  }
+
+  return users.filter((user) => {
+    return (
+      normalizeSearch(user.name).includes(term) ||
+      normalizeSearch(user.email).includes(term) ||
+      normalizeSearch(user.role).includes(term)
+    )
+  })
+})
+
+const hasFilteredUsers = computed(() => filteredUsers.value.length > 0)
+
+const totalUserPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredUsers.value.length / usersPerPage))
 })
 
 const paginatedUsers = computed(() => {
-  const users = company.value?.users ?? []
   const start = (currentUserPage.value - 1) * usersPerPage
 
-  return users.slice(start, start + usersPerPage)
+  return filteredUsers.value.slice(start, start + usersPerPage)
 })
 
 function syncUserPage() {
@@ -148,6 +173,10 @@ async function loadCompany() {
   }
 }
 
+watch(userSearchTerm, () => {
+  currentUserPage.value = 1
+})
+
 onMounted(() => {
   loadCompany()
 })
@@ -200,7 +229,23 @@ onMounted(() => {
           <button type="button" @click="openUserModal">Adicionar usuário</button>
         </div>
 
-        <div v-if="hasUsers" class="table-wrap">
+        <div class="filter-bar filter-bar--compact">
+          <div class="field filter-field">
+            <label for="user-search">Buscar usuário</label>
+            <input
+              id="user-search"
+              v-model="userSearchTerm"
+              type="search"
+              placeholder="Nome, e-mail ou cargo"
+            />
+          </div>
+
+          <p class="subtle filter-meta">
+            {{ filteredUsers.length }} usuário{{ filteredUsers.length === 1 ? '' : 's' }}
+          </p>
+        </div>
+
+        <div v-if="hasUsers && hasFilteredUsers" class="table-wrap">
           <table class="users-table">
             <thead>
               <tr>
@@ -239,9 +284,7 @@ onMounted(() => {
               Anterior
             </button>
 
-            <p class="subtle">
-              Página {{ currentUserPage }} de {{ totalUserPages }}
-            </p>
+            <p class="subtle">Página {{ currentUserPage }} de {{ totalUserPages }}</p>
 
             <button
               type="button"
@@ -254,6 +297,7 @@ onMounted(() => {
           </div>
         </div>
 
+        <p v-else-if="hasUsers" class="subtle">Nenhum usuário corresponde ao filtro aplicado.</p>
         <p v-else class="subtle">Nenhum usuário vinculado a esta empresa.</p>
       </article>
     </section>

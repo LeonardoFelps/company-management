@@ -131,6 +131,33 @@ article {
   align-items: center;
 }
 
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfdff;
+}
+
+.filter-bar--compact {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.filter-field {
+  flex: 1 1 320px;
+}
+
+.filter-meta {
+  margin: 0;
+  white-space: nowrap;
+}
+
 .card-actions {
   margin-top: 16px;
 }
@@ -319,6 +346,16 @@ article {
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow);
+}
+
+.empty-state {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 24px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: #fbfdff;
 }
 
 @media (max-width: 900px) {

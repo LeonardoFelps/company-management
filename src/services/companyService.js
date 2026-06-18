@@ -14,6 +14,32 @@ function normalizeCnpj(value) {
   return String(value).replace(/\D/g, '')
 }
 
+function normalizeSearch(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+}
+
+function matchesCompanySearch(company, search) {
+  const term = normalizeSearch(search)
+
+  if (!term) {
+    return true
+  }
+
+  const name = normalizeSearch(company.name)
+  const cnpj = normalizeCnpj(company.cnpj)
+  const status = company.status === 1 ? 'ativa' : 'inativa'
+
+  const canMatchCnpj = /^\d+$/.test(term)
+  const hasDigits = /\d/.test(term)
+  const nameMatches = hasDigits ? name === term : name.includes(term)
+
+  return nameMatches || (canMatchCnpj && cnpj.includes(normalizeCnpj(term))) || status.includes(term)
+}
+
 async function ensureStoreLoaded() {
   if (storeLoaded) {
     return companiesStore
@@ -47,18 +73,19 @@ function hasDuplicateCnpj(cnpj, currentId) {
   })
 }
 
-export async function listCompanies(page = 1, perPage = 5) {
+export async function listCompanies(page = 1, perPage = 5, search = '') {
   await delay()
   await ensureStoreLoaded()
 
-  const total = companiesStore.length
+  const filteredCompanies = companiesStore.filter((company) => matchesCompanySearch(company, search))
+  const total = filteredCompanies.length
   const totalPages = Math.max(1, Math.ceil(total / perPage))
   const currentPage = Math.min(Math.max(1, Number(page)), totalPages)
   const start = (currentPage - 1) * perPage
   const end = start + perPage
 
   return {
-    items: clone(companiesStore.slice(start, end)),
+    items: clone(filteredCompanies.slice(start, end)),
     total,
     page: currentPage,
     perPage,

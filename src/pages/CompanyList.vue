@@ -1,21 +1,24 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { deleteCompany, listCompanies } from '@/services/companyService'
 
 const companies = ref([])
 const loading = ref(false)
 const error = ref('')
+const searchTerm = ref('')
 const currentPage = ref(1)
 const perPage = 5
 const totalPages = ref(1)
 const totalItems = ref(0)
 
-async function loadCompanies(page = currentPage.value) {
+const hasCompanies = computed(() => companies.value.length > 0)
+
+async function loadCompanies(page = currentPage.value, search = searchTerm.value) {
   loading.value = true
   error.value = ''
 
   try {
-    const response = await listCompanies(page, perPage)
+    const response = await listCompanies(page, perPage, search)
     companies.value = response.items
     currentPage.value = response.page
     totalPages.value = response.totalPages
@@ -50,6 +53,10 @@ async function handleDelete(id) {
   await loadCompanies(currentPage.value)
 }
 
+watch(searchTerm, () => {
+  loadCompanies(1)
+})
+
 onMounted(() => {
   loadCompanies()
 })
@@ -66,10 +73,26 @@ onMounted(() => {
       <RouterLink class="secondary-link" to="/empresas/nova">Cadastrar empresa</RouterLink>
     </div>
 
+    <section class="filter-bar">
+      <div class="field filter-field">
+        <label for="company-search">Buscar empresa</label>
+        <input
+          id="company-search"
+          v-model="searchTerm"
+          type="search"
+          placeholder="Nome, CNPJ ou status"
+        />
+      </div>
+
+      <p class="subtle filter-meta">
+        {{ totalItems }} resultado{{ totalItems === 1 ? '' : 's' }}
+      </p>
+    </section>
+
     <p v-if="loading" class="subtle">Carregando empresas...</p>
     <p v-else-if="error" class="notice-error">{{ error }}</p>
 
-    <section v-else class="card-grid">
+    <section v-else-if="hasCompanies" class="card-grid">
       <article v-for="company in companies" :key="company.id">
         <div class="meta">
           <h2>{{ company.name }}</h2>
@@ -91,17 +114,22 @@ onMounted(() => {
         </div>
       </article>
 
-      <div v-if="totalItems > perPage" class="pagination">
+      <div v-if="totalPages > 1" class="pagination">
         <button type="button" @click="prevPage" :disabled="currentPage === 1">
           Anterior
         </button>
 
-        <span class="subtle">Pagina {{ currentPage }} de {{ totalPages }}</span>
+        <span class="subtle">Página {{ currentPage }} de {{ totalPages }}</span>
 
         <button type="button" @click="nextPage" :disabled="currentPage === totalPages">
           Próxima
         </button>
       </div>
+    </section>
+
+    <section v-else class="empty-state">
+      <h2>Nenhuma empresa encontrada</h2>
+      <p class="subtle">Tente ajustar o filtro ou cadastrar uma nova empresa.</p>
     </section>
   </main>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
-import { getCompanyById } from '@/services/companyService'
+import { computed, reactive, ref, onMounted } from 'vue'
+import { getCompanyById, addUserToCompany } from '@/services/companyService'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -13,6 +13,90 @@ const error = ref('')
 const hasUsers = computed(() => {
   return Array.isArray(company.value?.users) && company.value.users.length > 0
 })
+
+const showUserModal = ref(false)
+
+const userForm = reactive({
+  name: '',
+  email: '',
+  role: '',
+})
+
+const userError = ref('')
+const userSaving = ref(false)
+const userFieldErrors = reactive({
+  name: '',
+  email: '',
+  role: '',
+})
+
+function resetUserForm() {
+  userForm.name = ''
+  userForm.email = ''
+  userForm.role = ''
+
+  userError.value = ''
+  userFieldErrors.name = ''
+  userFieldErrors.email = ''
+  userFieldErrors.role = ''
+}
+
+function openUserModal() {
+  resetUserForm()
+  showUserModal.value = true
+}
+
+function closeUserModal() {
+  showUserModal.value = false
+}
+
+function validateUserForm() {
+  userFieldErrors.name = ''
+  userFieldErrors.email = ''
+  userFieldErrors.role = ''
+
+  let valid = true
+
+  if (!userForm.name.trim()) {
+    userFieldErrors.name = 'Nome é obrigatório'
+    valid = false
+  }
+
+  if (!userForm.email.trim()) {
+    userFieldErrors.email = 'E-mail é obrigatório'
+    valid = false
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userForm.email)) {
+    userFieldErrors.email = 'E-mail inválido'
+    valid = false
+  }
+
+  if (!userForm.role.trim()) {
+    userFieldErrors.role = 'Cargo é obrigatório'
+    valid = false
+  }
+
+  return valid
+}
+
+async function handleAddUser() {
+  userError.value = ''
+
+  if (!validateUserForm()) {
+    return
+  }
+
+  userSaving.value = true
+
+  try {
+    await addUserToCompany(id, userForm)
+    await loadCompany()
+    closeUserModal()
+  } catch (err) {
+    userError.value = err instanceof Error ? err.message : 'Erro ao salvar usuário'
+  } finally {
+    userSaving.value = false
+  }
+}
 
 async function loadCompany() {
   loading.value = true
@@ -76,7 +160,7 @@ onMounted(() => {
             <h3>Usuários vinculados</h3>
           </div>
 
-          <button type="button">Adicionar usuário</button>
+          <button type="button" @click="openUserModal">Adicionar usuário</button>
         </div>
 
         <div v-if="hasUsers" class="table-wrap">
@@ -106,98 +190,47 @@ onMounted(() => {
         <p v-else class="subtle">Nenhum usuário vinculado a esta empresa.</p>
       </article>
     </section>
+
+    <div v-if="showUserModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Novo usuário</p>
+        <h3>Adicionar usuário</h3>
+      </div>
+
+      <button type="button" class="ghost-button" @click="closeUserModal">Fechar</button>
+    </div>
+
+    <p v-if="userError" class="notice-error">{{ userError }}</p>
+
+    <form class="stack" @submit.prevent="handleAddUser">
+      <div class="field">
+        <label for="user-name">Nome</label>
+        <input id="user-name" v-model="userForm.name" type="text" />
+        <p v-if="userFieldErrors.name" class="field-error">{{ userFieldErrors.name }}</p>
+      </div>
+
+      <div class="field">
+        <label for="user-email">E-mail</label>
+        <input id="user-email" v-model="userForm.email" type="email" />
+        <p v-if="userFieldErrors.email" class="field-error">{{ userFieldErrors.email }}</p>
+      </div>
+
+      <div class="field">
+        <label for="user-role">Cargo</label>
+        <input id="user-role" v-model="userForm.role" type="text" />
+        <p v-if="userFieldErrors.role" class="field-error">{{ userFieldErrors.role }}</p>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
+        <button type="submit" :disabled="userSaving">
+          {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
   </main>
 </template>
-
-<style scoped>
-.company-layout {
-  display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-.details-card {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
-}
-
-.company-summary {
-  position: sticky;
-  top: 16px;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.section-label {
-  margin: 0 0 6px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.meta-list {
-  display: grid;
-  gap: 14px;
-}
-
-.meta-label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 0.86rem;
-  color: var(--muted);
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.users-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.users-table th,
-.users-table td {
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  vertical-align: middle;
-}
-
-.users-table th {
-  font-size: 0.86rem;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.users-table tbody tr:hover {
-  background: var(--surface-soft);
-}
-
-.small-button {
-  padding: 0.6rem 0.85rem;
-}
-
-@media (max-width: 900px) {
-  .company-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .company-summary {
-    position: static;
-  }
-
-  .section-header {
-    flex-direction: column;
-  }
-}
-</style>

@@ -82,7 +82,7 @@ onMounted(() => {
           </span>
         </div>
 
-        <div class="actions" style="margin-top: 16px">
+        <div class="actions card-actions">
           <RouterLink class="secondary-link" :to="`/empresas/${company.id}`">Visualizar</RouterLink>
           <RouterLink class="secondary-link" :to="`/empresas/${company.id}/editar`">Editar</RouterLink>
           <button class="danger-button" type="button" @click="handleDelete(company.id)">

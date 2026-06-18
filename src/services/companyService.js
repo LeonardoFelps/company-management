@@ -134,3 +134,25 @@ export async function deleteCompany(id) {
 
   return true
 }
+
+export async function addUserToCompany(companyId, userData) {
+  await delay()
+  await ensureStoreLoaded()
+
+  const company = companiesStore.find((item) => item.id === Number(companyId))
+
+  if (!company) {
+    throw new Error('Empresa não encontrada')
+  }
+
+  const newUser = {
+    id: Date.now(),
+    name: userData.name,
+    email: userData.email,
+    role: userData.role,
+  }
+
+  company.users.push(newUser)
+
+  return clone(newUser)
+}

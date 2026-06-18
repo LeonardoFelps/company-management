@@ -1,6 +1,6 @@
 <script setup>
 import { computed, reactive, ref, onMounted } from 'vue'
-import { getCompanyById, addUserToCompany } from '@/services/companyService'
+import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -98,6 +98,21 @@ async function handleAddUser() {
   }
 }
 
+async function handleRemoveUser(userId) {
+  const confirmed = window.confirm('Tem certeza que deseja remover este usuário?')
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    await removeUserFromCompany(id, userId)
+    await loadCompany()
+  } catch (err) {
+    userError.value = err instanceof Error ? err.message : 'Erro ao remover usuário'
+  }
+}
+
 async function loadCompany() {
   loading.value = true
   error.value = ''
@@ -180,7 +195,13 @@ onMounted(() => {
                 <td>{{ user.email }}</td>
                 <td>{{ user.role }}</td>
                 <td>
-                  <button type="button" class="danger-button small-button">Remover</button>
+                  <button
+                    type="button"
+                    class="danger-button small-button"
+                    @click="handleRemoveUser(user.id)"
+                  >
+                    Remover
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -192,45 +213,45 @@ onMounted(() => {
     </section>
 
     <div v-if="showUserModal" class="modal-backdrop">
-  <div class="modal-card">
-    <div class="section-header">
-      <div>
-        <p class="section-label">Novo usuário</p>
-        <h3>Adicionar usuário</h3>
-      </div>
+      <div class="modal-card">
+        <div class="section-header">
+          <div>
+            <p class="section-label">Novo usuário</p>
+            <h3>Adicionar usuário</h3>
+          </div>
 
-      <button type="button" class="ghost-button" @click="closeUserModal">Fechar</button>
+          <button type="button" class="ghost-button" @click="closeUserModal">Fechar</button>
+        </div>
+
+        <p v-if="userError" class="notice-error">{{ userError }}</p>
+
+        <form class="stack" @submit.prevent="handleAddUser">
+          <div class="field">
+            <label for="user-name">Nome</label>
+            <input id="user-name" v-model="userForm.name" type="text" />
+            <p v-if="userFieldErrors.name" class="field-error">{{ userFieldErrors.name }}</p>
+          </div>
+
+          <div class="field">
+            <label for="user-email">E-mail</label>
+            <input id="user-email" v-model="userForm.email" type="email" />
+            <p v-if="userFieldErrors.email" class="field-error">{{ userFieldErrors.email }}</p>
+          </div>
+
+          <div class="field">
+            <label for="user-role">Cargo</label>
+            <input id="user-role" v-model="userForm.role" type="text" />
+            <p v-if="userFieldErrors.role" class="field-error">{{ userFieldErrors.role }}</p>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
+            <button type="submit" :disabled="userSaving">
+              {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <p v-if="userError" class="notice-error">{{ userError }}</p>
-
-    <form class="stack" @submit.prevent="handleAddUser">
-      <div class="field">
-        <label for="user-name">Nome</label>
-        <input id="user-name" v-model="userForm.name" type="text" />
-        <p v-if="userFieldErrors.name" class="field-error">{{ userFieldErrors.name }}</p>
-      </div>
-
-      <div class="field">
-        <label for="user-email">E-mail</label>
-        <input id="user-email" v-model="userForm.email" type="email" />
-        <p v-if="userFieldErrors.email" class="field-error">{{ userFieldErrors.email }}</p>
-      </div>
-
-      <div class="field">
-        <label for="user-role">Cargo</label>
-        <input id="user-role" v-model="userForm.role" type="text" />
-        <p v-if="userFieldErrors.role" class="field-error">{{ userFieldErrors.role }}</p>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="ghost-button" @click="closeUserModal">Cancelar</button>
-        <button type="submit" :disabled="userSaving">
-          {{ userSaving ? 'Salvando...' : 'Salvar usuário' }}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
   </main>
 </template>

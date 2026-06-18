@@ -156,3 +156,24 @@ export async function addUserToCompany(companyId, userData) {
 
   return clone(newUser)
 }
+
+export async function removeUserFromCompany(companyId, userId) {
+  await delay()
+  await ensureStoreLoaded()
+
+  const company = companiesStore.find((item) => item.id === Number(companyId))
+
+  if (!company){
+    throw new Error('Empresa não encontrada')
+  }
+
+  const index = company.users.findIndex((user) => user.id === Number(userId))
+
+  if (index === -1 ) {
+    throw new Error('Usuário não encontrado')
+  }
+
+  company.users.splice(index, 1)
+
+  return true
+}

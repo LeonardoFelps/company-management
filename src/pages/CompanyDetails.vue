@@ -1,7 +1,7 @@
 <script setup>
 import { computed, reactive, ref, onMounted } from 'vue'
-import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
 import { useRoute } from 'vue-router'
+import { getCompanyById, addUserToCompany, removeUserFromCompany } from '@/services/companyService'
 
 const route = useRoute()
 const id = route.params.id
@@ -9,10 +9,29 @@ const id = route.params.id
 const company = ref(null)
 const loading = ref(false)
 const error = ref('')
+const currentUserPage = ref(1)
+const usersPerPage = 5
 
 const hasUsers = computed(() => {
   return Array.isArray(company.value?.users) && company.value.users.length > 0
 })
+
+const totalUserPages = computed(() => {
+  const totalUsers = company.value?.users?.length ?? 0
+
+  return Math.max(1, Math.ceil(totalUsers / usersPerPage))
+})
+
+const paginatedUsers = computed(() => {
+  const users = company.value?.users ?? []
+  const start = (currentUserPage.value - 1) * usersPerPage
+
+  return users.slice(start, start + usersPerPage)
+})
+
+function syncUserPage() {
+  currentUserPage.value = Math.min(Math.max(currentUserPage.value, 1), totalUserPages.value)
+}
 
 const showUserModal = ref(false)
 
@@ -90,6 +109,7 @@ async function handleAddUser() {
   try {
     await addUserToCompany(id, userForm)
     await loadCompany()
+    currentUserPage.value = totalUserPages.value
     closeUserModal()
   } catch (err) {
     userError.value = err instanceof Error ? err.message : 'Erro ao salvar usuário'
@@ -108,6 +128,7 @@ async function handleRemoveUser(userId) {
   try {
     await removeUserFromCompany(id, userId)
     await loadCompany()
+    syncUserPage()
   } catch (err) {
     userError.value = err instanceof Error ? err.message : 'Erro ao remover usuário'
   }
@@ -119,6 +140,7 @@ async function loadCompany() {
 
   try {
     company.value = await getCompanyById(id)
+    syncUserPage()
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Erro ao carregar empresa'
   } finally {
@@ -190,7 +212,7 @@ onMounted(() => {
             </thead>
 
             <tbody>
-              <tr v-for="user in company.users" :key="user.id">
+              <tr v-for="user in paginatedUsers" :key="user.id">
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.role }}</td>
@@ -206,6 +228,30 @@ onMounted(() => {
               </tr>
             </tbody>
           </table>
+
+          <div v-if="totalUserPages > 1" class="pagination">
+            <button
+              type="button"
+              class="ghost-button"
+              :disabled="currentUserPage === 1"
+              @click="currentUserPage--"
+            >
+              Anterior
+            </button>
+
+            <p class="subtle">
+              Página {{ currentUserPage }} de {{ totalUserPages }}
+            </p>
+
+            <button
+              type="button"
+              class="ghost-button"
+              :disabled="currentUserPage === totalUserPages"
+              @click="currentUserPage++"
+            >
+              Próxima
+            </button>
+          </div>
         </div>
 
         <p v-else class="subtle">Nenhum usuário vinculado a esta empresa.</p>

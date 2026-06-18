@@ -1,44 +1,52 @@
-# .
+# Company Management
 
-This template should help get you started developing with Vue 3 in Vite.
+Aplicação frontend em Vue 3 para gerenciamento de empresas e usuários, desenvolvida como teste técnico para simular um cenário real de backoffice.
 
-## Recommended IDE Setup
+## Stack
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Vue 3
+- Composition API
+- Fetch
+- Vue Router
 
-## Recommended Browser Setup
+## Funcionalidades
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- Listagem de empresas
+- Paginação
+- Loading state
+- Tratamento de erro da API
+- Cadastro de empresa
+- Edição de empresa
+- Exclusão de empresa
+- Detalhes da empresa
+- Listagem de usuários vinculados
+- Cadastro de usuário
+- Remoção de usuário
+- Validação de CNPJ
 
-## Customize configuration
+## Como rodar
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### Instalar dependências
 
-## Project Setup
-
-```sh
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Executar em ambiente de desenvolvimento
 
-```sh
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+## Observações
 
-```sh
-npm run build
-```
+- Os dados iniciais são carregados via `fetch` a partir de um JSON público em `public/mock/companies.json`.
+- O CRUD é mantido em memória para simular uma API fake durante a navegação.
+- O formulário de empresa possui validação de CNPJ e bloqueio de duplicidade.
 
-### Lint with [ESLint](https://eslint.org/)
+## Estrutura principal
 
-```sh
-npm run lint
-```
+- `src/pages`: páginas da aplicação
+- `src/services`: camada de acesso aos dados
+- `src/utils`: utilitários e validações
+- `public/mock`: dados iniciais em JSON

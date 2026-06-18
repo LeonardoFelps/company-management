@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getCompanyById, updateCompany } from '@/services/companyService'
+import { getCompanyById } from '@/services/companyService'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -30,21 +30,29 @@ onMounted(() => {
 
 <template>
     <main>
-        <h1>Detalhes da Empresa</h1>
+        <div class="toolbar">
+            <div>
+                <h1>Detalhes da Empresa</h1>
+                <p class="subtle">Visão geral do cadastro selecionado.</p>
+            </div>
 
-        <p>
-            <RouterLink to="/empresas">Voltar para a lista</RouterLink>
-        </p>
+            <RouterLink class="secondary-link" to="/empresas">Voltar para a lista</RouterLink>
+        </div>
 
-        <p v-if="loading">Carregando detalhes da empresa...</p>
+        <p v-if="loading" class="subtle">Carregando detalhes da empresa...</p>
 
-        <p v-else-if="error">{{ error }}</p>
+        <p v-else-if="error" class="notice-error">{{ error }}</p>
 
-        <section v-else-if="company">
+        <section v-else-if="company" class="card-grid">
             <article>
                 <h2>{{ company.name }}</h2>
                 <p>CNPJ: {{ company.cnpj }}</p>
-                <p>Status: {{ company.status === 1 ? 'Ativa' : 'Inativa' }}</p>
+                <span
+                    class="status-pill"
+                    :class="company.status === 1 ? 'status-active' : 'status-inactive'"
+                >
+                    {{ company.status === 1 ? 'Ativa' : 'Inativa' }}
+                </span>
             </article>
         </section>
     </main>

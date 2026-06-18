@@ -57,34 +57,46 @@ onMounted(() => {
 
 <template>
   <main>
-    <h1>Empresas</h1>
+    <div class="toolbar">
+      <div>
+        <h1>Empresas</h1>
+        <p class="subtle">Gerencie cadastros, status e navegação entre telas.</p>
+      </div>
 
-    <p>
-      <RouterLink to="/empresas/nova">Cadastrar empresa</RouterLink>
-    </p>
+      <RouterLink class="secondary-link" to="/empresas/nova">Cadastrar empresa</RouterLink>
+    </div>
 
-    <p v-if="loading">Carregando empresas...</p>
-    <p v-else-if="error">{{ error }}</p>
+    <p v-if="loading" class="subtle">Carregando empresas...</p>
+    <p v-else-if="error" class="notice-error">{{ error }}</p>
 
-    <section v-else>
+    <section v-else class="card-grid">
       <article v-for="company in companies" :key="company.id">
-        <h2>{{ company.name }}</h2>
-        <p>CNPJ: {{ company.cnpj }}</p>
-        <p>Status: {{ company.status === 1 ? 'Ativa' : 'Inativa' }}</p>
+        <div class="meta">
+          <h2>{{ company.name }}</h2>
+          <p>CNPJ: {{ company.cnpj }}</p>
+          <span
+            class="status-pill"
+            :class="company.status === 1 ? 'status-active' : 'status-inactive'"
+          >
+            {{ company.status === 1 ? 'Ativa' : 'Inativa' }}
+          </span>
+        </div>
 
-        <div>
-          <RouterLink :to="`/empresas/${company.id}`">Visualizar</RouterLink>
-          <RouterLink :to="`/empresas/${company.id}/editar`">Editar</RouterLink>
-          <button type="button" @click="handleDelete(company.id)">Excluir</button>
+        <div class="actions" style="margin-top: 16px">
+          <RouterLink class="secondary-link" :to="`/empresas/${company.id}`">Visualizar</RouterLink>
+          <RouterLink class="secondary-link" :to="`/empresas/${company.id}/editar`">Editar</RouterLink>
+          <button class="danger-button" type="button" @click="handleDelete(company.id)">
+            Excluir
+          </button>
         </div>
       </article>
 
-      <div v-if="totalItems > perPage">
+      <div v-if="totalItems > perPage" class="pagination">
         <button type="button" @click="prevPage" :disabled="currentPage === 1">
           Anterior
         </button>
 
-        <span>Pagina {{ currentPage }} de {{ totalPages }}</span>
+        <span class="subtle">Pagina {{ currentPage }} de {{ totalPages }}</span>
 
         <button type="button" @click="nextPage" :disabled="currentPage === totalPages">
           Próxima
